@@ -1,0 +1,5 @@
+venv/
+build/
+dist/
+ansible_vault_keys.egg-info/
+__pycache__/

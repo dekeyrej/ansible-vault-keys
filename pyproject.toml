@@ -1,0 +1,43 @@
+[project]
+name = "ansible-vault-keys"
+version = "0.2.0"
+description = "Selective encryption of YAML keys using Ansible Vault, with full round-trip support"
+authors = [
+    { name = "Joe DeKeyrel", email = "joedekeyrel@email.com" }
+]
+readme = "README.md"
+license-files = ["LICENSE"]
+requires-python = ">=3.8"
+dependencies = [
+    "ansible>=2.18",
+    "ruamel.yaml>=0.18",
+]
+keywords = ["ansible", "vault", "yaml", "encryption", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+]
+
+[project.scripts]
+ansible-vault-keys = "ansible_vault_keys.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "pytest", 
+    "pytest-cov", 
+    "coverage", 
+    "ruff"
+]
