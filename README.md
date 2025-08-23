@@ -1,5 +1,15 @@
 # ansible-vault-keys
 
+![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen?style=flat-square)
+![Tests](https://img.shields.io/badge/Tests-Passing-green?style=flat-square)
+![License](https://img.shields.io/github/license/dekeyrej/ansible-vault-keys?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat-square)
+![Repo Size](https://img.shields.io/github/repo-size/dekeyrej/ansible-vault-keys?style=flat-square)
+![Last Commit](https://img.shields.io/github/last-commit/dekeyrej/ansible-vault-keys?style=flat-square)
+[![PyPI](https://img.shields.io/pypi/v/ansible-vault-keys?style=flat-square)](https://pypi.org/project/ansible-vault-keys/)
+![Encryption Style](https://img.shields.io/badge/Encryption-Selective%20%26%20Elegant-purple?style=flat-square)
+![YAML Fidelity](https://img.shields.io/badge/YAML-Roundtrip%20Safe-yellow?style=flat-square)
+
 Selective encryption of YAML keys using Ansible Vault — with full round-trip support.
 
 ## ✨ Why?
@@ -14,6 +24,12 @@ This tool lets you encrypt only the sensitive keys in your YAML files, preservin
 - ✅ Readability
 
 No more guessing what's inside a vault-encrypted blob. Just mark the keys you want to encrypt, and keep the rest visible.
+
+## 🧙‍♂️ Philosophy
+
+This tool is itended to be a _companion_ to `ansible-vault`, not a replacement. It’s built for clarity, maintainability, and expressive workflows — especially when documenting or collaborating on infrastructure.
+
+Think of it as a scribe that encrypts only what must be hidden, while preserving the story around it. In keeping with the design goals - Your YAML remains readable, annotated, and collaborative — even when secrets are tucked away.
 
 ## 🚀 Quickstart
 
@@ -105,12 +121,6 @@ options:
   --dry-run             Show changes without writing to file
 ```
 
-
-## 🧙‍♂️ Philosophy
-
-This tool is a companion to `ansible-vault`, not a replacement. It’s built for clarity, maintainability, and expressive workflows — especially when documenting or collaborating on infrastructure.
-
-Think of it as a scribe that encrypts only what must be hidden, while preserving the story around it. In keeping with the design goals - Your YAML remains readable, annotated, and collaborative — even when secrets are tucked away.
 
 ## 📦 Install
 

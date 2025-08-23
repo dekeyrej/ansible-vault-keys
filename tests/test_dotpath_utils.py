@@ -2,7 +2,6 @@ import pytest
 from ansible_vault_keys.dotpath_utils import (
     expand_dot_path_wildcards,
     encrypt_dot_path_recursively,
-    decrypt_dot_path_recursively,
     decrypt_all_tagged_scalars,
 )
 from ansible_vault_keys.vault_utils import initialize_vault
@@ -53,28 +52,31 @@ def test_encrypt_dot_path_recursively(vault, sample_data):
     success = encrypt_dot_path_recursively(sample_data, "somekey.1", vault)
     assert not success
 
-def test_decrypt_dot_path_recursively(vault, sample_data):
-    encrypt_dot_path_recursively(sample_data, "api.key", vault)
-    success = decrypt_dot_path_recursively(sample_data, "api.key", vault)
-    assert success
-    assert sample_data["api"]["key"] == "hunter2"
-    encrypt_dot_path_recursively(sample_data, "servers.0.password", vault)
-    success = decrypt_dot_path_recursively(sample_data, "servers.0.password", vault)
-    assert success
-    assert sample_data["servers"][0]["password"] == "one"
-    encrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
-    success = decrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
-    assert success
-    assert sample_data["simplelist"][0] == "item1"
-    encrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
-    success = decrypt_dot_path_recursively(sample_data, "simplelist.3", vault)
-    assert not success
-    encrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
-    success = decrypt_dot_path_recursively(sample_data, "simplelist.1", vault)
-    assert not success
-    encrypt_dot_path_recursively(sample_data, "api.key", vault)
-    success = decrypt_dot_path_recursively(sample_data, "api.user", vault)
-    assert not success
+# def test_decrypt_dot_path_recursively(vault, sample_data):
+#     encrypt_dot_path_recursively(sample_data, "api.key", vault)
+#     success = decrypt_dot_path_recursively(sample_data, "api.key", vault)
+#     assert success
+#     assert sample_data["api"]["key"] == "hunter2"
+#     encrypt_dot_path_recursively(sample_data, "servers.0.password", vault)
+#     success = decrypt_dot_path_recursively(sample_data, "servers.0.password", vault)
+#     assert success
+#     assert sample_data["servers"][0]["password"] == "one"
+#     encrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
+#     success = decrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
+#     assert success
+#     assert sample_data["simplelist"][0] == "item1"
+#     encrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
+#     success = decrypt_dot_path_recursively(sample_data, "simplelist.3", vault)
+#     assert not success
+#     encrypt_dot_path_recursively(sample_data, "simplelist.0", vault)
+#     success = decrypt_dot_path_recursively(sample_data, "simplelist.1", vault)
+#     assert not success
+#     encrypt_dot_path_recursively(sample_data, "api.key", vault)
+#     success = decrypt_dot_path_recursively(sample_data, "api.user", vault)
+#     assert not success
+#     encrypt_dot_path_recursively(sample_data, "api.key", vault)
+#     success = decrypt_dot_path_recursively(sample_data, "api.key.version", vault)
+#     assert not success
 
 def test_decrypt_all_tagged_scalars(vault, sample_data):
     encrypt_dot_path_recursively(sample_data, "api.key", vault)

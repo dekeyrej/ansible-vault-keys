@@ -64,5 +64,5 @@ def main():
         elif command == 'view':
             display_output(vars)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

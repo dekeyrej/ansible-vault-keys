@@ -1,6 +1,6 @@
 [project]
 name = "ansible-vault-keys"
-version = "0.2.0"
+version = "0.2.1"
 description = "Selective encryption of YAML keys using Ansible Vault, with full round-trip support"
 authors = [
     { name = "Joe DeKeyrel", email = "joedekeyrel@email.com" }
@@ -39,5 +39,16 @@ dev = [
     "pytest", 
     "pytest-cov", 
     "coverage", 
-    "ruff"
+    "ruff",
+    "build",
+    "twine",
+    "bumpver"
 ]
+
+[bumpver]
+current_version = "0.2.1"
+version_pattern = "MAJOR.MINOR.PATCH"
+
+[bumpver.file_patterns]
+"pyproject.toml" = [ 'version = "{version}"' ]
+"ansible_vault_keys/__init__.py" = [ '^__version__ = "{version}"$' ]

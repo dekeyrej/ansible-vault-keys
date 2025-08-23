@@ -102,34 +102,35 @@ def decrypt_all_tagged_scalars(data, vault, path_prefix=''):
 
     return decrypted_paths
 
-### not currently used
-def decrypt_dot_path_recursively(data, path, vault):
-    """
-    Recursively traverses a dot-path and decrypts the final value if it's vault-tagged.
-    Returns True if decryption succeeded.
-    """
-    keys = path.split('.')
-    current = data
-    try:
-        for i, key in enumerate(keys):
-            is_last = i == len(keys) - 1
+# Deprecated: superseded by decrypt_all_tagged_scalars
+# Retained for reference; not used in current workflows
+# def decrypt_dot_path_recursively(data, path, vault):
+#     """
+#     Recursively traverses a dot-path and decrypts the final value if it's vault-tagged.
+#     Returns True if decryption succeeded.
+#     """
+#     keys = path.split('.')
+#     current = data
+#     try:
+#         for i, key in enumerate(keys):
+#             is_last = i == len(keys) - 1
 
-            if isinstance(current, list):
-                index = int(key)
-                if is_last:
-                    if isinstance(current[index], TaggedScalar):
-                        current[index] = ansible_vault_decrypt_str(vault, current[index])
-                        return True
-                    return False
-                current = current[index]
-            elif isinstance(current, dict):
-                if is_last:
-                    if isinstance(current.get(key), TaggedScalar):
-                        current[key] = ansible_vault_decrypt_str(vault, current[key])
-                        return True
-                    return False
-                current = current.get(key)
-            else:
-                return False
-    except (KeyError, IndexError, ValueError, TypeError):
-        return False
+#             if isinstance(current, list):
+#                 index = int(key)
+#                 if is_last:
+#                     if isinstance(current[index], TaggedScalar):
+#                         current[index] = ansible_vault_decrypt_str(vault, current[index])
+#                         return True
+#                     return False
+#                 current = current[index]
+#             elif isinstance(current, dict):
+#                 if is_last:
+#                     if isinstance(current.get(key), TaggedScalar):
+#                         current[key] = ansible_vault_decrypt_str(vault, current[key])
+#                         return True
+#                     return False
+#                 current = current.get(key)
+#             else:
+#                 return False
+#     except (KeyError, IndexError, ValueError, TypeError):
+#         return False

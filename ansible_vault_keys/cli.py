@@ -1,4 +1,5 @@
 import argparse
+from ansible_vault_keys import __version__
 
 def read_commandline_args():
     ap = argparse.ArgumentParser(description="Selectively encrypt sensitive variables")
@@ -8,4 +9,5 @@ def read_commandline_args():
     ap.add_argument("--vault-password-file", default='vault.password', help="Path to vault password file")
     ap.add_argument("--keys", nargs="+", default=[], help="Keys to encrypt")
     ap.add_argument("--dry-run", action="store_true", help="Show changes without writing to file")
+    ap.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     return ap.parse_args()
