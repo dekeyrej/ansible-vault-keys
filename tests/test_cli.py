@@ -1,7 +1,7 @@
 import sys
 import argparse
 import pytest
-from tools.ansible_vault_keys.cli import read_commandline_args
+from ansible_vault_keys.cli import read_commandline_args
 
 def test_encrypt_command_parsing(monkeypatch):
     test_args = [

@@ -2,7 +2,7 @@ import os
 import sys
 import tempfile
 import pytest
-from tools.ansible_vault_keys import main as vault_main
+from ansible_vault_keys import main as vault_main
 
 from ruamel.yaml import YAML
 
@@ -21,6 +21,11 @@ def sample_yaml(tmp_path):
     content = """
     username: admin
     password: secret
+    items:
+    - name: item1
+      value: 123
+    - name: item2
+      value: 456
     api:
       key: hunter2
     """
@@ -29,6 +34,40 @@ def sample_yaml(tmp_path):
     return str(path)
 
 def test_encrypt_and_decrypt_flow(monkeypatch, sample_yaml, vault_file):
+    # Encrypt
+    monkeypatch.setattr(sys, "argv", [
+        "prog",
+        "encrypt",
+        sample_yaml,
+        "--vault-password-file", vault_file,
+        "--keys", "password", "api.key",  "items.*.value", "bobs.*", "api.user"
+    ])
+    vault_main.main()
+
+    # Load and check encryption
+    with open(sample_yaml) as f:
+        data = yaml.load(f)
+    assert "encrypted_keys" in data
+    assert set(data["encrypted_keys"]) == {"password", "api.key", "items.0.value", "items.1.value"}
+    assert data["password"].tag == "!vault"
+    
+    # Decrypt
+    monkeypatch.setattr(sys, "argv", [
+        "prog",
+        "decrypt",
+        sample_yaml,
+        "--keys", "password", "api.key",
+        "--vault-password-file", vault_file
+    ])
+    vault_main.main()
+
+    # Load and check decryption
+    with open(sample_yaml) as f:
+        data = yaml.load(f)
+    assert data["password"] == "secret"
+    assert data["api"]["key"] == "hunter2"
+
+def test_encrypt_and_view_flow(monkeypatch, sample_yaml, vault_file, capsys):
     # Encrypt
     monkeypatch.setattr(sys, "argv", [
         "prog",
@@ -49,8 +88,25 @@ def test_encrypt_and_decrypt_flow(monkeypatch, sample_yaml, vault_file):
     # Decrypt
     monkeypatch.setattr(sys, "argv", [
         "prog",
-        "decrypt",
+        "view",
         sample_yaml,
+        "--vault-password-file", vault_file
+    ])
+    vault_main.main()
+    # Capture output
+    captured = capsys.readouterr()
+    assert "username: admin" in captured.out
+    assert "password: secret" in captured.out
+    assert "key: hunter2" in captured.out
+
+def test_decrypt_flow(monkeypatch, sample_yaml, vault_file):
+
+    # Decrypt
+    monkeypatch.setattr(sys, "argv", [
+        "prog",
+        "decrypt",
+        "tests/encrypted_sample.yaml",
+        "--keys", "password", "api.key",
         "--vault-password-file", vault_file
     ])
     vault_main.main()
@@ -61,4 +117,19 @@ def test_encrypt_and_decrypt_flow(monkeypatch, sample_yaml, vault_file):
     assert data["password"] == "secret"
     assert data["api"]["key"] == "hunter2"
 
-    
+def test_encrypt_dry_run(monkeypatch, sample_yaml, vault_file, capsys):
+    # Encrypt
+    monkeypatch.setattr(sys, "argv", [
+        "prog",
+        "encrypt",
+        sample_yaml,
+        "--vault-password-file", vault_file,
+        "--keys", "password", "api.key",
+        "--dry-run"
+    ])
+    vault_main.main()
+    # Capture output
+    captured = capsys.readouterr()
+    assert "username: admin" in captured.out
+    assert "password: !vault |" in captured.out
+    assert "encrypted_keys:" in captured.out

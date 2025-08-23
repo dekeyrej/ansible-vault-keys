@@ -6,12 +6,12 @@ users:
 - name: fred
   password: Wilma! # this is sensitive too
 - name: wilma
-  password: OhFred! # this is sensitive too
+  password:OhFred! # this is sensitive too
 accounttype: google
 apikey: abcpdq564738 # this is sensitive too
 # List of encrypted dot-paths
 encrypted_keys:
 - apikey
-- adminuser.password
 - users.0.password
+- adminuser.password
 - users.1.password

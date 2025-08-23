@@ -1,5 +1,5 @@
 import pytest
-from tools.ansible_vault_keys.vault_utils import (
+from ansible_vault_keys.vault_utils import (
     initialize_vault,
     ansible_vault_encrypt_str,
     ansible_vault_decrypt_str,
@@ -10,13 +10,20 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 
 @pytest.fixture
 def vault():
-    return initialize_vault("tools/tests/vault_password.txt")
+    return initialize_vault("tests/vault_password.txt")
 
 def test_encrypt_decrypt_roundtrip(vault):
     original = "hunter2"
     encrypted = ansible_vault_encrypt_str(vault, original)
     decrypted = ansible_vault_decrypt_str(vault, encrypted)
     assert decrypted == original
+
+def test_encrypt_decrypt_failed_roundtrip(vault):
+    original = "hunter2"
+    encrypted = ansible_vault_encrypt_str(vault, original)
+    # Simulate failure by passing corrupted encrypted string
+    decrypted = ansible_vault_decrypt_str(vault, encrypted + "corruption")
+    assert decrypted != original
 
 def test_vault_tagged_scalar_format(vault):
     value = "hunter2"
@@ -32,6 +39,12 @@ def test_vault_tagged_scalar_passthrough(vault):
     result = vault_tagged_scalar(vault, tagged)
     assert result is tagged  # should return unchanged
 
+def test_vault_tagged_scalar_passthrough2(monkeypatch,vault):
+    monkeypatch.setattr(vault, "encrypt", lambda x: (_ for _ in ()).throw(Exception("fail")))
+    value = "already_encrypted"
+    result = vault_tagged_scalar(vault, value)
+    assert result is value  # should return unchanged
+
 def test_encrypt_failure(monkeypatch, vault):
     monkeypatch.setattr(vault, "encrypt", lambda x: (_ for _ in ()).throw(Exception("fail")))
     result = ansible_vault_encrypt_str(vault, "hunter2")
@@ -39,7 +52,7 @@ def test_encrypt_failure(monkeypatch, vault):
 
 def test_initialize_vault_no_password_file_no_ansible_cfg(monkeypatch):
     # Simulate no ansible.cfg found
-    monkeypatch.setattr("tools.ansible_vault_keys.vault_utils.find_ansible_config", lambda: None)
+    monkeypatch.setattr("ansible_vault_keys.vault_utils.find_ansible_config", lambda: None)
 
     # Expect sys.exit(1) due to missing password file
     with pytest.raises(SystemExit) as excinfo:
@@ -47,20 +60,28 @@ def test_initialize_vault_no_password_file_no_ansible_cfg(monkeypatch):
 
     assert excinfo.value.code == 1
 
-def test_initialize_vault_with_config_fallback(monkeypatch, tmp_path):
+def test_initialize_vault_no_password_file_no_ansible_cfg2(monkeypatch):
+    # Simulate no ansible.cfg found
+    monkeypatch.setattr("os.path.exists", lambda x: False)
+
+    # Expect sys.exit(1) due to missing password file
+    with pytest.raises(SystemExit) as excinfo:
+        initialize_vault(None)
+
+    assert excinfo.value.code == 1
+
+def test_initialize_vault_with_config_fallback(tmp_path):
     # Create a vault password file
     vault_file = tmp_path / "vault_password.txt"
     vault_file.write_text("hunter2")
 
     # Create a fake ansible.cfg that points to it
-    config_file = tmp_path / "ansible.cfg"
-    config_file.write_text(f"""
+    config_file = "./ansible.cfg"
+    with open(config_file, "w") as f:
+        f.write(f"""
 [defaults]
 vault_password_file = {vault_file}
 """)
-
-    # Monkeypatch find_ansible_config to return our fake config
-    monkeypatch.setattr("tools.ansible_vault_keys.vault_utils.find_ansible_config", lambda: str(config_file))
 
     # Call initialize_vault with None to trigger fallback
     vault = initialize_vault(None)
@@ -69,3 +90,21 @@ vault_password_file = {vault_file}
     encrypted = vault.encrypt("secret").decode("utf-8")
     decrypted = vault.decrypt(encrypted).decode("utf-8")
     assert decrypted == "secret"
+
+def test_initialize_vault_with_config_fallback_no_ansible_cfg(monkeypatch, capsys):
+    monkeypatch.setattr("ansible_vault_keys.vault_utils.find_ansible_config", lambda: None)
+    # Call initialize_vault with None to trigger fallback
+    with pytest.raises(SystemExit) as excinfo:
+        vault = initialize_vault(None)
+    # capture = capsys.readouterr()
+    # assert "No Ansible config found." in capture.out
+
+def test_initialize_vault_not_found_password_file(monkeypatch):
+    # Simulate no ansible.cfg found
+    # monkeypatch.setattr("ansible_vault_keys.vault_utils.find_ansible_config", lambda: None)
+
+    # Expect sys.exit(1) due to missing password file
+    with pytest.raises(SystemExit) as excinfo:
+        initialize_vault("non_existent_file.txt")
+
+    assert excinfo.value.code == 1

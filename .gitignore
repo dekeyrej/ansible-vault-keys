@@ -3,3 +3,6 @@ build/
 dist/
 ansible_vault_keys.egg-info/
 __pycache__/
+.coverage
+ansible.cfg
+vault.password
