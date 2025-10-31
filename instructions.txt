@@ -1,3 +1,7 @@
 bumpver update --patch
 python -m build
 twine upload dist/*
+
+git add .
+git commit -m "<git commit comment here>"
+git push
