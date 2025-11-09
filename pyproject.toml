@@ -1,6 +1,6 @@
 [project]
 name = "ansible-vault-keys"
-version = "0.2.2"
+version = "0.2.3"
 description = "Selective encryption of YAML keys using Ansible Vault, with full round-trip support"
 authors = [
     { name = "Joe DeKeyrel", email = "joedekeyrel@email.com" }
@@ -46,7 +46,7 @@ dev = [
 ]
 
 [bumpver]
-current_version = "0.2.2"
+current_version = "0.2.3"
 version_pattern = "MAJOR.MINOR.PATCH"
 
 [bumpver.file_patterns]

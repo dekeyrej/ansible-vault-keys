@@ -50,7 +50,8 @@ def ansible_vault_encrypt_str(vault, value_str) -> str:
     
 def ansible_vault_decrypt_str(vault, value_str) -> str:
     try:
-        decrypted_value = vault.decrypt(value_str)
+        # after ansible 2.18.11, the TaggedScalar must be converted to a string before decryption
+        decrypted_value = vault.decrypt(str(value_str))
         return decrypted_value.decode('utf-8')  # Decode bytes to string
     except Exception as e:
         logging.error(f"Error decrypting vault: {e}")
